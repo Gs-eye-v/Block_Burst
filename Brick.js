@@ -298,7 +298,7 @@ export class Brick {
 
                 // 3. 強烈なブルーム（光の拡散）
                 ctx.shadowColor = c;
-                ctx.shadowBlur = 60; // 周囲の暗闇を照らす強烈なハロー効果
+                ctx.shadowBlur = 20; // 周囲の暗闇を照らす強烈なハロー効果
 
                 // 4. 外周ガラス管（ベースカラー）の描画
                 ctx.beginPath();

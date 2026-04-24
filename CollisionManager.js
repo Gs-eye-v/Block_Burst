@@ -51,7 +51,7 @@ export class CollisionManager {
                 ball.y = this.game.entities.paddle.y - ball.radius;
 
                 // Pierce Charge Consumption on Paddle Hit
-                if (this.game.pierceCharges > 0) {
+                if (this.game.pierceCharges > 0 && !ball.isPiercing) {
                     this.game.entities.notices.push({
                         text: "PIERCE",
                         x: ball.x,
@@ -60,6 +60,7 @@ export class CollisionManager {
                         timer: 60
                     });
                     ball.pierceTimer = 10;
+                    ball.isPiercing = true;
                     this.game.pierceCharges--;
                 }
 
@@ -98,7 +99,8 @@ export class CollisionManager {
                     if (isBlackHole) continue;
 
                     // 1. Reflex Logic: Always reflect if normal ball OR if it's Metal OR if it has a Shield
-                    if (!ball.isPiercing || isMetal || brick.hasShield) {
+                    // Piercing balls go through normal bricks, but REFLECT on Shield and Metal
+                    if (isMetal || !ball.isPiercing || brick.hasShield) {
                         const overlapX = (ball.radius + brick.w / 2) - Math.abs(ball.x - (brick.x + brick.w / 2));
                         const overlapY = (ball.radius + brick.h / 2) - Math.abs(ball.y - (brick.y + brick.h / 2));
 
@@ -137,11 +139,10 @@ export class CollisionManager {
                             if (this.game.sounds) this.game.sounds.playMetalHit();
                             brick.hitTimer = 5;
                             // Metal never breaks
-                            if (ball.isPiercing) break; 
-                            continue;
+                            break; 
                         }
 
-                        // Shield Logic: 10 hits durability for normal balls, shatter on piercing
+                        // Shield Logic: 10 hits durability for normal balls, shatter for piercing
                         if (brick.hasShield) {
                             if (ball.isPiercing) {
                                 brick.hasShield = false;
@@ -160,9 +161,12 @@ export class CollisionManager {
                                 }
                             }
                             brick.hitTimer = 5;
-                            continue; // Stop further processing for this collision
+                            continue; // Stop further processing for this collision (No damage to inner brick)
                         }
                     }
+
+                    // --- PIERCING / PASS-THROUGH LOGIC (Beyond reflection) ---
+                    // Note: Shield shatter is now handled inside reflection block above to ensure reflection happens.
 
 
                     // Chameleon Transformation (Type 7)
@@ -199,7 +203,11 @@ export class CollisionManager {
                         if (brick.type === 6) {
                             brick.isIgnited = true;
                         } else {
-                            brick.health--;
+                            if (ball.isPiercing) {
+                                brick.health = 0; // One-hit kill for piercing balls
+                            } else {
+                                brick.health--;
+                            }
                         }
                         this.game.gameState.addScore(Math.floor(50 * diff.score));
                         
@@ -314,17 +322,20 @@ export class CollisionManager {
                 label = "LIFE";
                 break;
             case 'PIERCE':
-                this.game.entities.balls.forEach(b => {
-                    if (!b.isCharging && !b.isExploding && !b.hasExplosionCharge) {
-                        b.pierceStacks = (b.pierceStacks || 0) + 1;
-                        if (b.pierceTimer <= 0) {
-                            b.pierceStacks--;
+                if (this.game.gameState.difficulty === 'superEasy') {
+                    // SuperEasy (超簡単): Immediately apply to all balls
+                    this.game.entities.balls.forEach(b => {
+                        if (!b.isCharging && !b.isExploding) {
                             b.pierceTimer = 10;
                             b.isPiercing = true;
                         }
-                    }
-                });
-                label = "PIERCE";
+                    });
+                    label = "PIERCE";
+                } else {
+                    // All other difficulties: Charge the paddle for the next hit (Stackable)
+                    this.game.pierceCharges = (this.game.pierceCharges || 0) + 1;
+                    label = "CHARGE";
+                }
                 break;
             case 'SLOW':
                 this.game.slowTimer = 3.0; // 3 seconds real-time

@@ -83,7 +83,7 @@ export class EntityManager {
         }
 
         // 4. Item Rush（アイテムラッシュ）の判定と生成
-        const ITEM_RUSH_BRICK_THRESHOLD = 5;
+        const ITEM_RUSH_BRICK_THRESHOLD = 3;
         const ITEM_RUSH_BALL_THRESHOLD = 2;
         const ITEM_RUSH_SPAWN_TIME = 300; // 5秒相当
         const NOTICE_DEFAULT_DURATION = 120;

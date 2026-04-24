@@ -79,7 +79,9 @@ export class Renderer {
 
     createParticles(x, y, color, count) {
         this.shake();
-        for (let i = 0; i < count; i++) {
+        const theme = this.game.themeManager;
+        const finalCount = (theme && theme.currentThemeName === 'neon') ? Math.floor(count * 0.5) : count;
+        for (let i = 0; i < finalCount; i++) {
             this.game.entities.particles.push(new Particle(x, y, color));
         }
     }

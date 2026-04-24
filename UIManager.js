@@ -496,27 +496,32 @@ export class UIManager {
 
         // DOM notification (for visibility over overlays)
         if (this.nowPlaying) {
-            const parts = name.split(': ');
-            if (parts.length === 2) {
-                const title = parts[1];
-                const composer = parts[0];
-                
-                // 言語を問わず一定文字数で強制改行（日本語等に対応）
-                const wrapText = (text, limit) => {
-                    if (text.length <= limit) return text;
-                    // word-break: break-all を併用するため、ここでは単純に分割
-                    return text.substring(0, limit) + "<br>" + text.substring(limit);
-                };
+            let composer = "";
+            let title = name;
 
-                const titleDisplay = wrapText(title, 12);
-                const composerDisplay = wrapText(composer, 15);
+            // 1. [Composer] Title format
+            const bracketMatch = name.match(/^\[(.*?)\]([\s\S]*)$/);
+            // 2. Composer: Title or Composer:Title format
+            const colonMatch = name.match(/^(.*?):([\s\S]*)$/);
 
+            if (bracketMatch) {
+                composer = bracketMatch[1];
+                title = bracketMatch[2];
+            } else if (colonMatch) {
+                composer = colonMatch[1];
+                title = colonMatch[2];
+            }
+
+            if (composer) {
+                const titleDisplay = title.replace(/\n/g, '<br>');
+                const composerDisplay = composer.replace(/\n/g, '<br>');
                 this.nowPlaying.innerHTML = `
                     <div class="bgm-title">${titleDisplay}</div>
                     <div class="bgm-composer">${composerDisplay}</div>
                 `;
             } else {
-                this.nowPlaying.textContent = name;
+                const nameDisplay = name.replace(/\n/g, '<br>');
+                this.nowPlaying.innerHTML = `<div class="bgm-title">${nameDisplay}</div>`;
             }
             
             this.nowPlaying.classList.remove('visible');

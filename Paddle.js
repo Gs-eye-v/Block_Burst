@@ -232,7 +232,7 @@ export class Paddle {
         }
 
         // Enchantment Glow (Orange Pulse)
-        if (this.hasPendingPierce) {
+        if (this.game && this.game.pierceCharges > 0) {
             ctx.beginPath();
             ctx.roundRect(this.x - 4, this.y - 4, this.width + 8, this.height + 8, 12);
             const pulseAlpha = 0.4 + Math.sin(this.visualTimer / 150) * 0.2;

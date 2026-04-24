@@ -37,7 +37,7 @@ if (typeof CanvasRenderingContext2D.prototype.roundRect !== 'function') {
 
 const ITEM_SPAWN_BASE_TIME = 900;
 const ITEM_RUSH_SPAWN_TIME = 300;
-const ITEM_RUSH_BRICK_THRESHOLD = 5;
+const ITEM_RUSH_BRICK_THRESHOLD = 3;
 const ITEM_RUSH_BALL_THRESHOLD = 3;
 const CLEAR_WAIT_DURATION = 60;
 const LAUNCH_WAIT_DURATION = 60;

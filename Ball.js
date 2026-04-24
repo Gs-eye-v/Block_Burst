@@ -9,7 +9,6 @@ export class Ball {
         this.speed = speed;
         this.vx = vx; this.vy = vy; this.isPiercing = false;
         this.pierceTimer = 0;
-        this.pierceStacks = 0;
         this.isStuck = false; this.stuckX = 0; this.trail = [];
         
         // New State for Explosion Ball
@@ -53,15 +52,8 @@ export class Ball {
         if (this.pierceTimer > 0) {
             this.pierceTimer -= (dt / 1000) * sm;
             if (this.pierceTimer <= 0) {
-                // Stack consumption logic
-                if (this.pierceStacks > 0) {
-                    this.pierceStacks--;
-                    this.pierceTimer = 10;
-                    this.isPiercing = true;
-                } else {
-                    this.pierceTimer = 0;
-                    this.isPiercing = false;
-                }
+                this.pierceTimer = 0;
+                this.isPiercing = false;
             } else {
                 this.isPiercing = true;
             }
@@ -169,7 +161,7 @@ export class Ball {
             grad.addColorStop(0.3, theme.getColor('ballPierceMid'));
             grad.addColorStop(1, theme.getColor('ballPierceOuter'));
             ctx.fillStyle = grad;
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = (theme.currentThemeName === 'neon') ? 20 : 8;
             ctx.shadowColor = theme.getColor('ballPierceOuter');
         } else if (this.isExploding || this.isCharging) {
             // Explosion Charge Visual: Pulsing size if charging

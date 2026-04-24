@@ -308,7 +308,6 @@ canvas {
     color: #fff;
     text-shadow: 0 0 15px var(--color-accent-primary), 0 0 30px var(--color-accent-primary);
     animation: pulse 1.5s infinite;
-    word-break: break-all;
 }
 
 @keyframes pulse {
@@ -334,7 +333,8 @@ canvas {
     white-space: normal;
     max-width: 90vw;
     text-align: center;
-    word-break: break-all;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
     z-index: 9999 !important;
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -344,6 +344,8 @@ canvas {
     font-size: 1.4rem !important;
     font-weight: 900 !important;
     margin-bottom: -5px;
+    word-break: auto-phrase;
+    white-space: pre-wrap;
 }
 
 .bgm-composer {
