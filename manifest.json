@@ -3,6 +3,7 @@
     "short_name": "DeiScore",
     "description": "パステルカラーの大人かわいいプレミアム・ブロック崩しゲーム",
     "start_url": "./index.html",
+    "scope": "./",
     "display": "fullscreen",
     "background_color": "#FDFCFB",
     "theme_color": "#FFB7B2",

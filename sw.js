@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deiscore-v18';
+const CACHE_NAME = 'deiscore-v19';
 const AUDIO_CACHE_NAME = 'deiscore-audio-cache-v1';
 const ASSETS_TO_CACHE = [
     './',
@@ -23,8 +23,7 @@ const ASSETS_TO_CACHE = [
     './stageData.js',
     './utils.js',
     './icon2.png',
-    './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap'
+    './manifest.json'
 ];
 
 // Install Event
@@ -60,12 +59,10 @@ self.addEventListener('fetch', (event) => {
                     if (cachedResponse) return cachedResponse;
                     
                     return fetch(event.request).then((networkResponse) => {
-                        if (networkResponse.status === 200) {
+                        if (networkResponse && networkResponse.status === 200) {
                             cache.put(event.request, networkResponse.clone());
                         }
                         return networkResponse;
-                    }).catch(() => {
-                        // Return nothing or a specific error response if offline and not cached
                     });
                 });
             })
@@ -73,19 +70,25 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Default Strategy for other assets: Stale-while-revalidate
+    // Default Strategy: Stale-while-revalidate
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             const fetchPromise = fetch(event.request).then((networkResponse) => {
-                if (!networkResponse || networkResponse.status !== 200) {
-                    return networkResponse;
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
                 }
-                const responseToCache = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseToCache);
-                });
                 return networkResponse;
-            }).catch(() => {});
+            }).catch((error) => {
+                // If both cache and network fail, we must NOT return undefined
+                // If cachedResponse exists, this catch won't affect the final return anyway
+                // but if it doesn't, we should log or handle it.
+                console.error('[SW] Fetch failed:', error);
+                // We re-throw to let the browser handle it (shows offline page)
+                throw error;
+            });
 
             return cachedResponse || fetchPromise;
         })
