@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deiscore-v17';
+const CACHE_NAME = 'deiscore-v18';
 const AUDIO_CACHE_NAME = 'deiscore-audio-cache-v1';
 const ASSETS_TO_CACHE = [
     './',
