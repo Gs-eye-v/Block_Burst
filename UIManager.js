@@ -1,5 +1,5 @@
 import { CLASSIC_PLAYLIST } from './playlist.js';
-const GAME_VERSION = '2.4.9';
+const GAME_VERSION = '2.4.11';
 
 /**
  * UIManager: DOM要素の管理、UI表示の更新、および設定のセーブ/ロードを担当するクラス
@@ -500,9 +500,9 @@ export class UIManager {
             let title = name;
 
             // 1. [Composer] Title format
-            const bracketMatch = name.match(/^\[(.*?)\]([\s\S]*)$/);
+            const bracketMatch = name.match(/^\[(.*?)\]\n?([\s\S]*)$/);
             // 2. Composer: Title or Composer:Title format
-            const colonMatch = name.match(/^(.*?):([\s\S]*)$/);
+            const colonMatch = name.match(/^(.*?):\n?([\s\S]*)$/);
 
             if (bracketMatch) {
                 composer = bracketMatch[1];
@@ -516,8 +516,8 @@ export class UIManager {
                 const titleDisplay = title.replace(/\n/g, '<br>');
                 const composerDisplay = composer.replace(/\n/g, '<br>');
                 this.nowPlaying.innerHTML = `
-                    <div class="bgm-title">${titleDisplay}</div>
                     <div class="bgm-composer">${composerDisplay}</div>
+                    <div class="bgm-title">${titleDisplay}</div>
                 `;
             } else {
                 const nameDisplay = name.replace(/\n/g, '<br>');
