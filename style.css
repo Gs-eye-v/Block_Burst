@@ -1,0 +1,897 @@
+:root {
+    /* Base Colors */
+    --color-bg-deep: #1A1A2E;
+    --color-bg-light: #FFF9F9;
+    --color-accent-primary: #FFB7B2;   /* Sakura Pink */
+    --color-accent-secondary: #B5EAD7; /* Mint Green */
+    --color-accent-tertiary: #BDE0FE;  /* Sky Blue */
+    --color-warning: #ff4d4d;          /* Red */
+    --color-highlight: #FFD700;        /* Gold */
+    --color-star: #FFFFD1;             /* Star Yellow */
+    
+    /* Text Colors */
+    --color-text-main: #444444;
+    --color-text-muted: #999999;
+    --color-text-white: #FFFFFF;
+    --color-text-white-dim: rgba(255, 255, 255, 0.8);
+    --color-text-brand: rgba(0, 0, 0, 0.6);
+    --color-text-version: rgba(0, 0, 0, 0.3);
+    
+    /* UI Elements */
+    --color-panel-bg: rgba(255, 255, 255, 0.9);
+    --color-glass-border: #FFFFFF;
+    --color-overlay-bg: rgba(0, 0, 0, 0.85);
+    --color-miss-overlay-bg: rgba(40, 0, 0, 0.9);
+    --color-card-bg: rgba(0, 0, 0, 0.6);
+    --color-border-dim: rgba(255, 255, 255, 0.1);
+    
+    /* Legacy / Compatibility */
+    --bg-color: #000000;
+    --primary-color: #0000ff;
+    --accent-color: var(--color-accent-secondary);
+    --text-color: #333333;
+    --panel-bg: var(--color-panel-bg);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --font-family: 'Outfit', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-bg-deep); 
+  touch-action: none; 
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  display: block;
+}
+
+/* ゲームコンテナを 9:16 の比率で中央に配置 */
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg-light);
+  /* Decoration: Border waves/dots */
+  background-image:
+      radial-gradient(var(--color-accent-primary) 2px, transparent 2px),
+      radial-gradient(var(--color-accent-secondary) 2px, transparent 2px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: var(--color-bg-deep);
+}
+
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 155px;
+    padding: 15px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    background: var(--color-accent-primary);
+    gap: 8px !important;
+    /* Cloud Decorations */
+    background-image:
+        radial-gradient(circle at 20% 120%, white 40px, transparent 41px),
+        radial-gradient(circle at 50% 130%, white 60px, transparent 61px),
+        radial-gradient(circle at 80% 120%, white 40px, transparent 41px),
+        /* Stars */
+        radial-gradient(circle at 10% 20%, var(--color-star) 2px, transparent 3px),
+        radial-gradient(circle at 90% 30%, var(--color-star) 2px, transparent 3px),
+        radial-gradient(circle at 40% 10%, var(--color-star) 3px, transparent 4px);
+}
+
+.score-group {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.stat-box {
+    background: var(--color-panel-bg);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--color-glass-border);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    pointer-events: auto;
+    padding: 6px 10px !important;
+}
+
+.score-group .stat-box {
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: 145px;
+    padding: 4px 10px !important;
+}
+
+.score-group .label-text {
+    margin-bottom: 0 !important;
+    margin-right: 8px;
+    font-size: 0.65rem !important;
+}
+
+.stat-box.stage-info {
+    border: 2px solid var(--color-accent-secondary);
+    background: #F0FFF0;
+    transform: scale(1.05);
+    z-index: 15;
+}
+
+.bgm-box {
+    min-width: 100px;
+}
+
+#bgm-selector {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 700;
+    color: var(--color-text-main);
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    max-width: 130px;
+    text-overflow: ellipsis;
+}
+
+/* ポーズボタン（ギアアイコン）のデザインをステータスボックス（.stat-box）に完全に同期 */
+#pause-btn {
+    background: var(--color-panel-bg) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px);
+    border: 2px solid var(--color-glass-border) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+    
+    width: 60px !important;
+    height: 55px !important;
+    
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000 !important;
+    pointer-events: auto;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+/* ホバー・アクティブ時の挙動 */
+#pause-btn:active {
+    background: #fdfdfd !important;
+    transform: scale(0.95) !important;
+}
+
+/* ヘッダー内のラベル（SCOREなど）の調整 */
+.label-text {
+    font-size: 0.7rem !important;
+    margin-bottom: 2px !important;
+    display: block;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.1;
+}
+
+/* 数値の表示を中央に寄せる */
+#score-val, #best-val, #lives-val, #stage-val {
+    font-size: 1.3rem !important;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--color-text-main);
+    font-variant-numeric: tabular-nums;
+}
+
+.score-group #score-val, .score-group #best-val {
+    font-size: 1.05rem !important;
+}
+
+/* 2. ヘッダー要素のスリム化（狭い画面対策） */
+#lives-container, #stage-container {
+    min-width: 50px !important;
+}
+
+#msg-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-overlay-bg);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important;
+    align-items: center;
+    padding-top: 1.5vh !important;
+    z-index: 100;
+    transition: opacity 0.4s ease, visibility 0.4s;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* ポーズ・ミス画面での不要な要素の非表示 */
+#msg-overlay.paused .bgm-info-card,
+#msg-overlay.paused #next-bgm-btn,
+#msg-overlay.paused #next-stage-btn,
+#msg-overlay.miss .bgm-info-card,
+#msg-overlay.miss #next-bgm-btn,
+#msg-overlay.miss #next-stage-btn {
+    display: none !important;
+}
+
+/* ミス画面専用の赤っぽいオーバーレイ */
+#msg-overlay.miss {
+    background: var(--color-miss-overlay-bg) !important;
+}
+#msg-overlay.miss h1 {
+    color: var(--color-accent-primary) !important;
+    text-shadow: 0 0 15px rgba(255, 183, 178, 0.5);
+}
+
+#msg-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.msg-content {
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+#msg-title {
+    font-size: 1.8rem !important;
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+    margin: 0 0 5px 0 !important;
+    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-tertiary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+}
+
+#msg-text {
+    font-size: 1.2rem;
+    color: var(--color-text-white-dim);
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+}
+
+.controls-hint {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.text-highlight-glow {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 15px var(--color-accent-primary), 0 0 30px var(--color-accent-primary);
+    animation: pulse 1.5s infinite;
+    word-break: break-all;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#now-playing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--color-text-white-dim) !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 65% !important;
+    transform: translate(-50%, -50%) !important;
+    white-space: normal;
+    max-width: 90vw;
+    text-align: center;
+    word-break: break-all;
+    z-index: 9999 !important;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.bgm-title {
+    font-size: 1.4rem !important;
+    font-weight: 900 !important;
+    margin-bottom: -5px;
+}
+
+.bgm-composer {
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+    opacity: 0.8;
+}
+
+#now-playing.visible {
+    opacity: 1;
+}
+/* BGM metadata info card */
+.bgm-info-card {
+    background: var(--color-card-bg);
+    border-radius: 12px;
+    width: 96%;
+    flex-grow: 1;
+    width: 98%;
+    max-height: 70vh !important;
+    overflow-y: auto;
+    padding: 15px;
+    text-align: left;
+    color: var(--color-text-white);
+    border: 1px solid var(--color-border-dim);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    margin: 5px auto 0 auto;
+}
+.bgm-info-card h3 {
+    color: var(--color-text-white);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    font-size: 1.15rem;
+    margin: 0 0 8px 0;
+}
+.bgm-info-card h4 {
+    color: var(--color-text-white);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+    margin: 20px 0 8px 0;
+    border-top: 1px solid var(--color-border-dim);
+    padding-top: 10px;
+}
+.bgm-info-card p {
+    color: var(--color-text-white);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* コンパクトなスコア表示 */
+.score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 10px 0;
+}
+.compact-score {
+    font-size: 1.2rem;
+    color: var(--color-text-white);
+    margin: 0;
+}
+
+/* 不要な設定ボタンを非表示（アイコンに集約または重複削除） */
+#msg-overlay:not(.paused):not(.miss) button:not(.icon-only):not(#next-bgm-btn):not(#next-stage-btn) {
+    display: none !important;
+}
+
+/* 設定ボタンをアイコン化 */
+#show-settings-btn.icon-only {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    min-width: unset !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+#pause-buttons {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 10px;
+    width: 90%;
+    margin: 0 auto 10px auto !important;
+}
+#pause-buttons button {
+    flex: 1;
+    padding: 10px 5px !important;
+    font-size: 0.9rem !important;
+    height: 45px;
+    white-space: nowrap;
+}
+
+/* 虹色風タイトル（クリア画面用） */
+.msg-title-clear {
+  background: linear-gradient(45deg, var(--color-highlight), var(--color-accent-primary), var(--color-accent-tertiary)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+/* ゲームオーバー専用 */
+.msg-title-gameover {
+  font-size: 3.5rem !important;
+  color: var(--color-warning) !important;
+  font-weight: 900 !important;
+  line-height: 1.2;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* ミス画面専用タイトル */
+.msg-title-miss {
+  font-size: 4rem !important;
+  font-weight: 900 !important;
+}
+
+/* 入力ロック中のボタン状態 */
+.btn-locked {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  filter: grayscale(1) !important;
+}
+
+/* シークレットタップ演出用 */
+.secret-tap-unlocked-1 { color: var(--color-accent-primary) !important; }
+.secret-tap-unlocked-2 { color: var(--color-accent-tertiary) !important; }
+
+/* ステージボタンの基本スタイル（JSからのcssText排除用） */
+.ui-button-stage {
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 12px 5px;
+    border-radius: 25px;
+    background: var(--color-accent-primary);
+    border: 3px solid white;
+    color: var(--color-bg-deep);
+    cursor: pointer;
+    font-weight: 700;
+    font-family: "Outfit";
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}
+
+/* PWA Update Toast */
+#update-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--color-accent-primary);
+    border-radius: 20px;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 3000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    color: var(--color-text-white);
+    font-family: 'Outfit', sans-serif;
+    pointer-events: none;
+    opacity: 0;
+}
+
+#update-toast.visible {
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+    opacity: 1;
+}
+
+#update-toast span {
+    font-size: 1rem;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+#update-toast button {
+    background: var(--color-accent-primary);
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    color: var(--color-bg-deep);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    font-family: 'Outfit', sans-serif;
+    white-space: nowrap;
+}
+
+#update-toast button:hover {
+    background: #FFD1CF;
+    transform: scale(1.05);
+}
+
+#update-toast button:active {
+    transform: scale(0.95);
+}
+
+/* Settings Modal Responsive & Scroll Support */
+#settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg-light);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    touch-action: auto !important;
+}
+
+.settings-modal {
+    background: var(--color-bg-light);
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    padding: 30px 20px 0px 20px;
+    text-align: center;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    touch-action: auto !important;
+    position: relative;
+}
+
+.settings-modal h2 {
+    color: var(--color-bg-deep);
+    margin: 0 0 10px 0;
+    font-family: 'Outfit';
+    font-size: 2rem;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+}
+
+.settings-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 15px 0 15px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Scrollbar Customization */
+.settings-content::-webkit-scrollbar {
+    width: 6px;
+}
+.settings-content::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+}
+.settings-content::-webkit-scrollbar-thumb {
+    background: var(--color-accent-primary);
+    border-radius: 10px;
+}
+
+.settings-item {
+    margin-bottom: 20px;
+}
+
+.settings-item label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+    font-family: 'Outfit';
+    font-size: 0.95rem;
+}
+
+.settings-modal button#close-settings-btn {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+    align-self: center;
+    position: relative;
+    z-index: 10;
+}
+
+/* Theme Lock: Only show if all cleared */
+#theme-selection-container {
+    display: none;
+}
+body.all-cleared #theme-selection-container {
+    display: block;
+}
+
+/* ============================================================
+   Refactoring: New Utility Classes for UIManager.js
+   ============================================================ */
+
+/* Text colors and accents */
+.text-accent-primary { color: var(--color-accent-primary); }
+.text-accent-tertiary { color: var(--color-accent-tertiary); }
+.text-highlight-glow {
+    color: #FFFFFF !important;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-shadow: 
+        0 0 10px rgba(255, 215, 0, 0.8),
+        0 0 20px rgba(255, 140, 0, 0.5),
+        2px 2px 4px rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+}
+.text-muted { color: var(--color-text-brand); }
+.text-very-muted { color: var(--color-text-version); }
+
+/* Start/Restart Screen */
+.restart-count {
+    font-size: 1.5em;
+    color: var(--color-accent-primary);
+}
+
+/* Game Over / Results */
+.score-val-large {
+    font-size: 1.5rem;
+    color: var(--color-text-white);
+}
+.game-over-stats {
+    margin-top: 10px;
+    color: var(--color-text-white-dim);
+}
+
+/* Miss Screen */
+.lives-waiting {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+}
+
+/* Version Info Block */
+.version-container {
+    margin-top: auto !important;
+    padding-top: 10px;
+    padding-bottom: 20px !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+    font-family: "Outfit";
+}
+.brand-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-brand);
+    margin-bottom: 2px;
+}
+.version-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-text-version);
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   Theme Definitions Placeholder
+   ============================================================ */
+
+/* ============================================================
+   Theme Definitions
+   ============================================================ */
+
+body[data-theme="neon"] {
+    --color-bg-deep: #050505;
+    --color-bg-light: #0a0a0a;
+    --color-accent-primary: #FF00FF;   /* Neon Magenta */
+    --color-accent-secondary: #00FFFF; /* Neon Cyan */
+    --color-accent-tertiary: #BCF132;  /* Neon Lime */
+    --color-warning: #FF0055;
+    --color-highlight: #00FFFF;
+    --color-star: #FFFFFF;
+    
+    --color-text-main: #FFFFFF;
+    --color-text-muted: #CCCCCC;
+    --color-text-brand: #FF00FF;
+    --color-text-version: rgba(255, 255, 255, 0.3);
+    
+    --color-bg-deep: #050505;
+    --color-bg-light: #111111;
+    --color-panel-bg: rgba(10, 10, 10, 0.9);
+    --color-glass-border: #FF00FF;
+    --color-card-bg: rgba(5, 5, 5, 0.85);
+    --color-border-dim: rgba(0, 255, 255, 0.2);
+    
+    background-color: #000;
+}
+
+body[data-theme="neon"] #game-container {
+    background-color: #050505;
+    background-image:
+        radial-gradient(#FF00FF 1px, transparent 1px),
+        radial-gradient(#00FFFF 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+body[data-theme="neon"] #ui-overlay {
+    background: #000;
+    border-bottom: 2px solid #FF00FF;
+    background-image:
+        radial-gradient(circle at 10% 20%, #00FFFF 2px, transparent 3px),
+        radial-gradient(circle at 90% 30%, #FF00FF 2px, transparent 3px);
+}
+
+body[data-theme="neon"] .stat-box {
+    background: #000 !important;
+    border: 2px solid #00FFFF !important;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+body[data-theme="neon"] .stat-box.stage-info {
+    border: 2px solid #FF00FF !important;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+}
+
+body[data-theme="neon"] #score-val, 
+body[data-theme="neon"] #best-val, 
+body[data-theme="neon"] #lives-val, 
+body[data-theme="neon"] #stage-val {
+    color: #FFFFFF;
+    text-shadow: 0 0 5px #00FFFF;
+}
+
+body[data-theme="neon"] .settings-modal {
+    background: #050505;
+    border: 4px solid #FF00FF;
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+}
+
+body[data-theme="neon"] .settings-modal h2 {
+    color: #FF00FF;
+    text-shadow: 0 0 10px #FF00FF;
+}
+
+body[data-theme="neon"] .settings-item label {
+    color: #00FFFF;
+}
+
+body[data-theme="neon"] select,
+body[data-theme="neon"] input[type="range"] {
+    background: #111;
+    color: #FFF;
+    border: 1px solid #FF00FF;
+}
+
+/* ============================================================
+   Icon & Button Visibility Fix
+   ============================================================ */
+#pause-btn, 
+#show-settings-btn, 
+.icon-only {
+    color: #FFFFFF !important;
+    border: 1px solid var(--color-accent-primary) !important;
+    background: rgba(255, 0, 255, 0.1) !important;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
+}
+
+#pause-btn svg, 
+#show-settings-btn svg, 
+.icon-only svg {
+    fill: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+}
+/* Game Over New Record Badges */
+.new-record-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.record-badge, .best-score-badge {
+    font-family: 'Outfit';
+    font-weight: 800;
+    font-size: 1.8rem;
+    padding: 5px 20px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.record-badge {
+    background: #FFD700;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.best-score-badge {
+    background: #FF3366;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.6);
+}
+
+.pulse {
+    animation: badge-pulse 1.5s infinite;
+}
+
+@keyframes badge-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================
+   Sweets Theme
+   ============================================================ */
+body[data-theme="sweets"] {
+    background-color: #FFF0F5 !important;
+    background-image: radial-gradient(#FFFFFF 1.5px, transparent 1.5px) !important;
+    background-size: 30px 30px !important;
+}
+
+body[data-theme="sweets"] #ui-overlay {
+    background: #6B4226 !important;
+    color: #FFFDD0 !important;
+    border-bottom: 3px solid #FFB6C1 !important;
+}
+
+body[data-theme="sweets"] .stat-box {
+    background: #FFFFFF !important;
+    border: 2px solid #FFB6C1 !important;
+    border-radius: 20px !important;
+    color: #6B4226 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+body[data-theme="sweets"] .label-text {
+    color: #FF69B4 !important;
+}
+
+body[data-theme="sweets"] #pause-btn {
+    background: #FFB6C1 !important;
+    border: 2px solid #FFFFFF !important;
+    color: #FFFFFF !important;
+    border-radius: 50% !important;
+}
+
+body[data-theme="sweets"] #game-container {
+    border: 8px solid #6B4226 !important;
+    border-radius: 20px;
+    overflow: hidden;
+}

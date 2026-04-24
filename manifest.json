@@ -1,0 +1,24 @@
+{
+    "name": "DeiScore",
+    "short_name": "DeiScore",
+    "description": "パステルカラーの大人かわいいプレミアム・ブロック崩しゲーム",
+    "start_url": "./index.html",
+    "display": "fullscreen",
+    "background_color": "#FDFCFB",
+    "theme_color": "#FFB7B2",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "icon2.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon2.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

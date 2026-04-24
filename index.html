@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DeiScore</title>
+    <meta name="description" content="プレミアムな体験を提供する、クラシックでモダンなブロック崩しゲーム。">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFB7B2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="DeiScore">
+    <link rel="icon" type="image/png" href="icon2.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon2.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="ui-overlay">
+            <div class="score-group">
+                <div class="stat-box">
+                    <span class="label-text">SCORE</span>
+                    <span id="score-val">000000000</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label-text">BEST</span>
+                    <span id="best-val">000000000</span>
+                </div>
+            </div>
+            <div class="stat-box" id="lives-container">
+                <span class="label-text">LIVES</span>
+                <span id="lives-val">3</span>
+            </div>
+            <div class="stat-box stage-info" id="stage-container">
+                <span class="label-text">STAGE</span>
+                <span id="stage-val">1</span>
+            </div>
+
+
+
+            <button id="pause-btn" title="Settings / Pause">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z" />
+                </svg>
+            </button>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="msg-overlay" class="visible">
+            <div class="msg-content">
+                <h1 id="msg-title">DeiScore</h1>
+                <p id="msg-text">TAP TO START</p>
+                <div id="msg-settings-btn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto; padding: 10px 20px; border-radius: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.2s; width: fit-content; margin-top: -20px; margin-bottom: 20px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z" />
+                    </svg>
+                    Settings
+                </div>
+                <div class="controls-hint" style="display: none;"></div>
+                <!-- Settings Button on Pause -->
+                <div id="pause-buttons" style="display: none; flex-direction: column; gap: 15px; margin-top: 25px; align-items: center;">
+                    <button id="show-settings-btn" style="padding: 12px 30px; width: 200px; border-radius: 25px; background: #FFB7B2; border: 3px solid white; color: #1A1A2E; cursor: pointer; font-weight: 700; font-family: 'Outfit'; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s;">Settings</button>
+                    <button id="next-bgm-btn" style="padding: 12px 30px; width: 200px; border-radius: 25px; background: #BDE0FE; border: 3px solid white; color: #1A1A2E; cursor: pointer; font-weight: 700; font-family: 'Outfit'; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s;">⏭ Next BGM</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Overlay -->
+        <div id="settings-overlay">
+            <div class="settings-modal">
+                <h2 id="settings-title" style="user-select: none; touch-action: manipulation; cursor: pointer;">DeiScore</h2>
+                
+                <div class="settings-content">
+                    <div class="settings-item">
+                        <label>BGM Volume</label>
+                        <input type="range" id="bgm-volume" min="0" max="1" step="0.05" value="1.0" style="width: 100%; height: 8px; border-radius: 5px; outline: none; background: #FFE0E0;">
+                    </div>
+                    
+                    <div class="settings-item">
+                        <label>SE Volume</label>
+                        <input type="range" id="se-volume" min="0" max="1" step="0.05" value="1.0" style="width: 100%; height: 8px; border-radius: 5px; outline: none; background: #FFE0E0;">
+                    </div>
+    
+                    <div class="settings-item">
+                        <label>Difficulty (難易度)</label>
+                        <select id="difficulty-setting" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #FFB7B2; background: white; font-family: 'Outfit'; font-weight: 700; color: #1A1A2E; outline: none;">
+                            <option value="easy">Easy (かんたん)</option>
+                            <option value="normal" selected>Normal (ふつう)</option>
+                            <option value="hard">Hard (むずかしい)</option>
+                        </select>
+                    </div>
+    
+                    <div class="settings-item">
+                        <label>Control Mode (操作方法)</label>
+                        <select id="control-mode" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #FFB7B2; background: white; font-family: 'Outfit'; font-weight: 700; color: #1A1A2E; outline: none;">
+                            <option value="zone" selected>Zone Tap (両手操作)</option>
+                            <option value="direct">Direct Follow (片手操作)</option>
+                        </select>
+                    </div>
+    
+                    <div id="theme-selection-container" class="settings-item">
+                        <label>Theme (テーマ設定)</label>
+                        <select id="theme-selector" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #FFB7B2; background: white; font-family: 'Outfit'; font-weight: 700; color: #1A1A2E; outline: none;">
+                            <option value="default">Default (標準)</option>
+                            <option value="neon">Neon (ネオン)</option>
+                            <option value="sweets">Sweets (お菓子)</option>
+                        </select>
+                    </div>
+
+                    <div id="paddle-speed-container" class="settings-item">
+                        <label>Paddle Speed (パドル速度)</label>
+                        <input type="range" id="paddle-speed-val" min="5" max="25" step="1" value="13" style="width: 100%; height: 8px; border-radius: 5px; outline: none; background: #FFE0E0;">
+                    </div>
+                    
+                    <div id="stage-selection-container" class="settings-item" style="display: none;">
+                        <label>Stage Select (ステージ選択)</label>
+                            <select id="stage-select-val" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #FFB7B2; background: white; font-family: 'Outfit'; font-weight: 700; color: #1A1A2E; outline: none;"></select>
+                    </div>
+    
+                    <div id="bgm-selection-container" class="settings-item" style="display: none;">
+                        <label>Free BGM Select (楽曲選択)</label>
+                        <select id="bgm-selector" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #BDE0FE; background: white; font-family: 'Outfit'; font-weight: 700; color: #1A1A2E; outline: none;">
+                            <option value="random" selected>Random</option>
+                            <option value="none">None</option>
+                        </select>
+                        <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">★ 100ステージクリア特典解放中 ★</p>
+                    </div>
+                </div>
+                
+                <button id="close-settings-btn" style="padding: 12px 35px; border-radius: 25px; background: #BDE0FE; border: 3px solid white; color: #1A1A2E; cursor: pointer; font-weight: 700; font-family: 'Outfit'; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s;">Back</button>
+            </div>
+        </div>
+
+        <div id="now-playing"></div>
+        <div id="update-toast">
+            <span>アプリの更新があります</span>
+            <button id="update-btn">更新して再起動</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                let refreshing = false;
+
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => {
+                        console.log('SW Registered!', reg);
+
+                        // 1. Detection of update existence
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                // 2. When new version is installed but waiting
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        // Update exists! Notify via UI
+                                        console.log('New SW version installed, notifying user...');
+                                        const notifyUpdate = () => {
+                                            if (window.gameInstance && window.gameInstance.ui) {
+                                                window.gameInstance.ui.showUpdateNotification(() => {
+                                                    newWorker.postMessage('SKIP_WAITING');
+                                                });
+                                            } else {
+                                                // GameInstance not ready yet, retry in 500ms
+                                                setTimeout(notifyUpdate, 500);
+                                            }
+                                        };
+                                        notifyUpdate();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => console.log('SW Registration Failed', err));
+
+                // 3. Controlled reload logic when worker changes
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    console.log('Controller changed, reloading page...');
+                    window.location.reload();
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
