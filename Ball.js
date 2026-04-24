@@ -155,16 +155,55 @@ export class Ball {
 
         ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         if (this.isPiercing) {
-            // "Fireball" Aesthetic
-            const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-            grad.addColorStop(0, theme.getColor('ballPierceCenter'));
-            grad.addColorStop(0.3, theme.getColor('ballPierceMid'));
-            grad.addColorStop(1, theme.getColor('ballPierceOuter'));
-            ctx.fillStyle = grad;
-            ctx.shadowBlur = (theme.currentThemeName === 'neon') ? 20 : 8;
-            ctx.shadowColor = theme.getColor('ballPierceOuter');
+            const isDefault = theme.currentThemeName === 'default';
+            
+            // 1. Heat Aura (Pulsing background glow)
+            // Use sin wave to pulse the size and intensity
+            const time = Date.now();
+            const pulse = Math.sin(time * 0.01) * 0.1 + 0.9; 
+            const auraRadius = this.radius * (1.3 + Math.sin(time * 0.008) * 0.2);
+            
+            ctx.save();
+            const auraGrad = ctx.createRadialGradient(this.x, this.y, this.radius * 0.4, this.x, this.y, auraRadius);
+            auraGrad.addColorStop(0, 'rgba(255, 69, 0, 0.5)');
+            auraGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
+            ctx.fillStyle = auraGrad;
+            ctx.globalAlpha = 0.6 * pulse;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, auraRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 2. Fireball Core
+            const coreGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+            if (isDefault) {
+                // High-performance Fireball for Default Theme
+                coreGrad.addColorStop(0, '#FFD700'); // Hot Yellow Core
+                coreGrad.addColorStop(0.3, '#FF8C00'); // Orange Mid
+                coreGrad.addColorStop(1, '#FF0000'); // Deep Red Edge
+                ctx.shadowBlur = 0; // Keep it fast on mobile
+            } else {
+                // Stylized versions for Neon/Sweets
+                coreGrad.addColorStop(0, theme.getColor('ballPierceCenter'));
+                coreGrad.addColorStop(0.3, theme.getColor('ballPierceMid'));
+                coreGrad.addColorStop(1, theme.getColor('ballPierceOuter'));
+                ctx.shadowBlur = (theme.currentThemeName === 'neon') ? 20 : 8;
+                ctx.shadowColor = theme.getColor('ballPierceOuter');
+            }
+            
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 3. Optional Stroke (Skip for Default as requested)
+            if (!isDefault) {
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = theme.getColor('ballPierceOuter');
+                ctx.stroke();
+            }
         } else if (this.isExploding || this.isCharging) {
-            // Explosion Charge Visual: Pulsing size if charging
+            // Explosion Charge Visual
             let pulseSize = 0;
             if (this.isCharging) {
                 pulseSize = Math.sin(this.visualTimer * 0.05) * 3;
@@ -177,6 +216,7 @@ export class Ball {
             ctx.fillStyle = grad;
             ctx.shadowBlur = 25 + pulseSize;
             ctx.shadowColor = '#FF4500';
+            ctx.fill();
             
             if (this.isCharging) {
                 // Sparks during charge
@@ -187,18 +227,17 @@ export class Ball {
                     ctx.fillRect(sx, sy, 2, 2);
                 }
             }
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#FFD700';
+            ctx.stroke();
         } else if (theme.currentThemeName === 'sweets') {
-            // Sweets Design: ストライプ模様のキャンディ / ガムボール
+            // Sweets Design
             ctx.save();
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.clip();
-
-            // ベース色（ポップな水色やピンク）
             ctx.fillStyle = '#ADD8E6'; // Soda color
             ctx.fill();
-
-            // ストライプ模様
             ctx.strokeStyle = '#FFB6C1'; // Strawberry pink
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -208,25 +247,23 @@ export class Ball {
             }
             ctx.stroke();
             ctx.restore();
-
-            // ツヤ（金平糖のような光沢）
             ctx.beginPath();
             ctx.arc(this.x - this.radius * 0.4, this.y - this.radius * 0.4, this.radius * 0.3, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.fill();
-            
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#FFFFFF';
             ctx.stroke();
         } else {
+            // Normal Ball
             ctx.fillStyle = theme.getColor('ballFill');
             ctx.shadowBlur = 8;
             ctx.shadowColor = theme.getColor('ballShadow');
             ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = theme.getColor('ballStroke');
+            ctx.stroke();
         }
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = this.isPiercing ? theme.getColor('ballPierceOuter') : theme.getColor('ballStroke');
-        ctx.stroke();
         ctx.restore();
     }
 }
