@@ -1,8 +1,7 @@
-const CACHE_NAME = 'deiscore-v19';
+const CACHE_NAME = 'deiscore-v21';
 const AUDIO_CACHE_NAME = 'deiscore-audio-cache-v1';
 const ASSETS_TO_CACHE = [
     './',
-    './index.html',
     './style.css',
     './script.js',
     './audio.js',
@@ -82,11 +81,16 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             }).catch((error) => {
-                // If both cache and network fail, we must NOT return undefined
-                // If cachedResponse exists, this catch won't affect the final return anyway
-                // but if it doesn't, we should log or handle it.
-                console.error('[SW] Fetch failed:', error);
-                // We re-throw to let the browser handle it (shows offline page)
+                // Return cache if we have it even for network errors
+                if (cachedResponse) return cachedResponse;
+                
+                // For navigation requests, try to return the root index as fallback
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./');
+                }
+                
+                // If no cache at all, log and throw (don't return undefined)
+                console.error('[SW] Fetch failed and no cache available:', error);
                 throw error;
             });
 

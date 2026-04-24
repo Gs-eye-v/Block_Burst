@@ -1,5 +1,5 @@
 import { CLASSIC_PLAYLIST } from './playlist.js';
-const GAME_VERSION = '2.4.7';
+const GAME_VERSION = '2.4.9';
 
 /**
  * UIManager: DOM要素の管理、UI表示の更新、および設定のセーブ/ロードを担当するクラス
