@@ -5,10 +5,12 @@ export class Item {
     constructor(x, y, game) {
         this.x = x; this.y = y; this.radius = 12; this.speed = 2.5;
 
-        // Dynamic PIERCE weight based on shield presence
+        // Dynamic weights based on shield presence
         let pierceWeight = 5;
+        let explosionWeight = 4;
         if (game && game.entities.bricks && game.entities.bricks.some(b => b.hasShield)) {
-            pierceWeight = 10;
+            pierceWeight = 15; // 3x base
+            explosionWeight = 12; // 3x base
         }
 
         // Weighted selection for Item drops (Difficulty Hardening)
@@ -16,9 +18,9 @@ export class Item {
             { type: 'EXPAND', weight: 8 },
             { type: 'MULTIBALL', weight: 10 },
             { type: 'PIERCE', weight: pierceWeight },
-            { type: 'SLOW', weight: 5 },
-            { type: 'EXPLOSION', weight: 4 }, // New Item
-            { type: 'LIFE', weight: 1 } // Life is now significantly rarer (1 in 29)
+            { type: 'SLOW', weight: 2.5 }, // Reduced from 5
+            { type: 'EXPLOSION', weight: explosionWeight },
+            { type: 'LIFE', weight: 1 }
         ];
 
         const totalWeight = weights.reduce((acc, w) => acc + w.weight, 0);
